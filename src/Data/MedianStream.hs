@@ -1,3 +1,13 @@
+{-|
+Module      : Data.MedianStream
+Description : Main module
+Copyright   : (c) Joseph Canero, 2016
+License     : BSD-3
+Maintainer  : jmc41493@gmail.com
+Stability   : experimental
+Portability : POSIX
+-}
+
 {-# LANGUAGE GADTs #-}
 
 module Data.MedianStream
@@ -18,29 +28,39 @@ import Data.Maybe (fromJust)
 type Left a  = MaxHeap a
 type Right a = MinHeap a
 
+-- | A MedianStream is a data type that can be inserted into and queried
+-- to get a median of a stream of numeric values.
 data MedianStream a where
   MedianStream :: (Real a, Eq a) => Left a -> Right a -> MedianStream a
 
+-- Infix wrapper around insert with the MedianStream on the left.
+-- Complexity: O(lgn)
 (+>) :: MedianStream a -> a -> MedianStream a
 (+>) ms a = insert a ms
 
+-- Infix wrapper around insert with the MedianStream on the right.
+-- Complexity: O(lgn)
 (<+) :: a -> MedianStream a -> MedianStream a
 (<+) = insert
 
+-- Create an empty MedianStream with no values.
+-- Complexity: O(1)
 empty :: (Real a, Eq a) => MedianStream a
 empty = MedianStream Heap.empty Heap.empty
 
+-- Insert a new numeric value into the median stream.
+-- Complexity: O(lgn)
 insert :: a -> MedianStream a -> MedianStream a
 insert a ms@(MedianStream lh rh)
   | even $ size ms = oddMedianStream
   | otherwise      = evenMedianStream
     where
       oddMedianStream
-        | not (Heap.null rh) && a >= fromJust (Heap.viewHead rh) =
+        | maybe False (a >=) $ Heap.viewHead rh =
           uncurry MedianStream $ popAndSwap lh rh a
         | otherwise = MedianStream (Heap.insert a lh) rh
       evenMedianStream
-        | a < fromJust (Heap.viewHead lh) =
+        | maybe False (a < ) $ Heap.viewHead lh =
           uncurry (flip MedianStream) $ popAndSwap rh lh a
         | otherwise = MedianStream lh (Heap.insert a rh)
 
@@ -49,6 +69,8 @@ median ms@(MedianStream lh rh)
   | even $ size ms = average <$> Heap.viewHead lh <*> Heap.viewHead rh
   | otherwise      = (fromRational . toRational) <$> Heap.viewHead lh
 
+-- Returns the number of elements in the MedianStream.
+-- Complexity: O(1)
 size :: MedianStream a -> Int
 size (MedianStream lh rh) = Heap.size lh + Heap.size rh
 
