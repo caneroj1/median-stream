@@ -33,22 +33,22 @@ type Right a = MinHeap a
 data MedianStream a where
   MedianStream :: (Real a, Eq a) => Left a -> Right a -> MedianStream a
 
--- Infix wrapper around insert with the MedianStream on the left.
+-- | Infix wrapper around insert with the MedianStream on the left.
 -- Complexity: O(lgn)
 (+>) :: MedianStream a -> a -> MedianStream a
 (+>) ms a = insert a ms
 
--- Infix wrapper around insert with the MedianStream on the right.
+-- | Infix wrapper around insert with the MedianStream on the right.
 -- Complexity: O(lgn)
 (<+) :: a -> MedianStream a -> MedianStream a
 (<+) = insert
 
--- Create an empty MedianStream with no values.
+-- | Create an empty MedianStream with no values.
 -- Complexity: O(1)
 empty :: (Real a, Eq a) => MedianStream a
 empty = MedianStream Heap.empty Heap.empty
 
--- Insert a new numeric value into the median stream.
+-- | Insert a new numeric value into the median stream.
 -- Complexity: O(lgn)
 insert :: a -> MedianStream a -> MedianStream a
 insert a ms@(MedianStream lh rh)
@@ -64,12 +64,15 @@ insert a ms@(MedianStream lh rh)
           uncurry (flip MedianStream) $ popAndSwap rh lh a
         | otherwise = MedianStream lh (Heap.insert a rh)
 
+-- | Query the MedianStream for the median of the stream of integers
+-- inserted so far.
+-- Complexity: O(1)
 median :: MedianStream a -> Maybe Double
 median ms@(MedianStream lh rh)
   | even $ size ms = average <$> Heap.viewHead lh <*> Heap.viewHead rh
   | otherwise      = (fromRational . toRational) <$> Heap.viewHead lh
 
--- Returns the number of elements in the MedianStream.
+-- | Returns the number of elements in the MedianStream.
 -- Complexity: O(1)
 size :: MedianStream a -> Int
 size (MedianStream lh rh) = Heap.size lh + Heap.size rh
