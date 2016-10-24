@@ -19,10 +19,13 @@ module Data.MedianStream
 , insert
 , median
 , size
+, fromList
+, insertList
 ) where
 
 import Data.Heap (MaxHeap, MinHeap, Heap)
 import qualified Data.Heap as Heap hiding (MaxHeap, MinHeap, Heap)
+import Data.List (foldl')
 import Data.Maybe (fromJust)
 
 type Left a  = MaxHeap a
@@ -76,6 +79,16 @@ median ms@(MedianStream lh rh)
 -- Complexity: O(1)
 size :: MedianStream a -> Int
 size (MedianStream lh rh) = Heap.size lh + Heap.size rh
+
+-- | Creates a MedianStream from a list of input elements.
+-- Complexity: O(nlgn)
+fromList :: (Real a, Eq a) => [a] -> MedianStream a
+fromList = insertList empty
+
+-- | Adds a list of input elements to an existing MedianStream
+-- Complexity: O(nlgn)
+insertList :: (Real a, Eq a) => MedianStream a -> [a] -> MedianStream a
+insertList = foldl' (+>)
 
 popAndSwap :: (Heap.HeapItem pol1 a,
                Heap.HeapItem pol2 a)

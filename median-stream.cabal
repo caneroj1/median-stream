@@ -23,11 +23,39 @@ library
 
 test-suite median-stream-test
   type:                exitcode-stdio-1.0
+  other-modules:       Utils
   hs-source-dirs:      test
+                     , utils
   main-is:             Spec.hs
   build-depends:       base
                      , median-stream
                      , QuickCheck
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+benchmark median-stream-bench-optimized
+  type:                exitcode-stdio-1.0
+  other-modules:       Utils
+  hs-source-dirs:      bench
+                     , utils
+  main-is:             Bench.hs
+  build-depends:       base
+                     , time
+                     , median-stream
+                     , random
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O3
+  default-language:    Haskell2010
+
+benchmark median-stream-bench-non-optimized
+  type:                exitcode-stdio-1.0
+  other-modules:       Utils
+  hs-source-dirs:      bench
+                     , utils
+  main-is:             Bench.hs
+  build-depends:       base
+                     , time
+                     , median-stream
+                     , random
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 
