@@ -23,7 +23,7 @@ module Data.MedianStream
 , insertList
 ) where
 
-import Control.Applicative
+import Control.Applicative ((<$>), (<*>))
 import Data.Heap (MaxHeap, MinHeap, Heap)
 import qualified Data.Heap as Heap hiding (MaxHeap, MinHeap, Heap)
 import Data.List (foldl')
