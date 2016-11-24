@@ -68,7 +68,7 @@ insert a ms@(MedianStream lh rh)
           uncurry (flip MedianStream) $ popAndSwap rh lh a
         | otherwise = MedianStream lh (Heap.insert a rh)
 
--- | Query the MedianStream for the median of the stream of integers
+-- | Query the MedianStream for the median of the stream of numbers
 -- inserted so far.
 -- Complexity: O(1)
 median :: MedianStream a -> Maybe Double
