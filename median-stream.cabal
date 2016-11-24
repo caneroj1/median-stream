@@ -1,5 +1,5 @@
 name:                median-stream
-version:             0.6.0.0
+version:             0.7.0.0
 synopsis:            Constant-time queries for the median of a stream of numeric
                      data.
 description:         Uses the two-heap approach to support O(lg n) insertions
