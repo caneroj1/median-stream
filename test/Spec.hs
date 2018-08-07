@@ -4,6 +4,7 @@ import Data.List hiding (insert)
 import Data.MedianStream
 import Test.QuickCheck
 import Utils
+import System.Exit
 
 prop_medianStreamOnInts :: [Int] -> Bool
 prop_medianStreamOnInts xs = medianOf xs == median (foldr insert empty xs)
@@ -48,6 +49,13 @@ halves ls = splitAt mid ls
   where mid = length ls `div` 2
 
 return []
+
+runTests :: IO Bool
 runTests = $quickCheckAll
 
-main = runTests
+main :: IO ()
+main = do
+  good <- runTests
+  if good
+    then exitSuccess
+    else exitFailure
