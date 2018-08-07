@@ -33,6 +33,7 @@ type Right a = MinHeap a
 -- | A MedianStream is a data type that can be inserted into and queried
 -- to get a median of a stream of numeric values.
 data MedianStream a = MedianStream !(Left a) !(Right a)
+  deriving Eq
 -- Invariants:
 --
 -- 1. Each element of the left heap is less than or equal to each
