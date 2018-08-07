@@ -42,26 +42,29 @@ data MedianStream a = MedianStream !(Left a) !(Right a)
 --    Heap.size rh <= Heap.size lh <= Heap.size rh + 1
 
 -- | Infix wrapper around insert with the MedianStream on the left.
--- Complexity: O(lgn)
+--
+-- Complexity: \( O (\lg n) \)
 (+>) :: Ord a => MedianStream a -> a -> MedianStream a
 (+>) ms a = insert a ms
 
 -- | Infix wrapper around insert with the MedianStream on the right.
--- Complexity: O(lgn)
+-- Complexity: \( O (\lg n) \)
 (<+) :: Ord a => a -> MedianStream a -> MedianStream a
 (<+) = insert
 
 -- | Create an empty MedianStream with no values.
--- Complexity: O(1)
+--
+-- Complexity: \( O(1) \)
 empty :: MedianStream a
 empty = MedianStream Heap.empty Heap.empty
 
 -- | Insert a new numeric value into the median stream.
--- Complexity: O(lgn)
+--
+-- Complexity: \( O(\lg n) \)
 insert :: Ord a => a -> MedianStream a -> MedianStream a
 insert a ms@(MedianStream lh rh)
-  -- | Heap.size lh < Heap.size rh = error "boom"
-  -- | Heap.size lh > Heap.size rh + 1 = error "bang"
+  -- \| Heap.size lh < Heap.size rh = error "boom"
+  -- \| Heap.size lh > Heap.size rh + 1 = error "bang"
   | even $ size ms = oddMedianStream
   | otherwise      = evenMedianStream
   where
@@ -91,7 +94,7 @@ insert a ms@(MedianStream lh rh)
 -- | Query the 'MedianStream' for the median of the stream of numbers
 -- inserted so far.
 --
--- Complexity: O(1)
+-- Complexity: \( O(1) \)
 median :: (Real a, Fractional b) => MedianStream a -> Maybe b
 median ms@(MedianStream lh rh)
   | even $ size ms = average <$> Heap.viewHead lh <*> Heap.viewHead rh
@@ -103,7 +106,7 @@ median ms@(MedianStream lh rh)
 -- | A version of 'median' optimized for the case where the result
 -- type is the same as the element type.
 --
--- Complexity: O(1)
+-- Complexity: \( O(1) \)
 medianSame :: (Real a, Fractional a) => MedianStream a -> Maybe a
 medianSame ms@(MedianStream lh rh)
   | even $ size ms = averageSame <$> Heap.viewHead lh <*> Heap.viewHead rh
@@ -112,17 +115,19 @@ medianSame ms@(MedianStream lh rh)
     averageSame x l = (x + l)/2
 
 -- | Returns the number of elements in the MedianStream.
--- Complexity: O(1)
+--
+-- Complexity: \( O(1) \)
 size :: MedianStream a -> Int
 size (MedianStream lh rh) = Heap.size lh + Heap.size rh
 
 -- | Creates a MedianStream from a list of input elements.
--- Complexity: O(n lg n)
+--
+-- Complexity: \( O(n \lg n) \)
 fromList :: Real a => [a] -> MedianStream a
 fromList = insertList empty
 
 -- | Adds a list of input elements to an existing MedianStream
--- Complexity: O(n lg n)
+--
+-- Complexity: \( O(n \lg n) \)
 insertList :: Real a => MedianStream a -> [a] -> MedianStream a
 insertList = foldl' (+>)
-
