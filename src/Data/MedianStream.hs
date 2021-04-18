@@ -129,11 +129,11 @@ size (MedianStream lh rh) = Heap.size lh + Heap.size rh
 -- | Creates a MedianStream from a list of input elements.
 --
 -- Complexity: \( O(n \lg n) \)
-fromList :: Ord a => [a] -> MedianStream a
+fromList :: (Foldable f,Ord a) => f a -> MedianStream a
 fromList = insertList empty
 
 -- | Adds a list of input elements to an existing MedianStream
 --
 -- Complexity: \( O(n \lg n) \)
-insertList :: Ord a => MedianStream a -> [a] -> MedianStream a
+insertList :: (Foldable f,Ord a) => MedianStream a -> f a -> MedianStream a
 insertList = foldl' (+>)
