@@ -17,6 +17,7 @@ module Data.MedianStream
 , insert
 , median
 , medianSame
+, medianWith
 , size
 , fromList
 , insertList
@@ -97,23 +98,27 @@ insert a ms@(MedianStream lh rh)
 --
 -- Complexity: \( O(1) \)
 median :: (Real a, Fractional b) => MedianStream a -> Maybe b
-median ms@(MedianStream lh rh)
-  | even $ size ms = average <$> Heap.viewHead lh <*> Heap.viewHead rh
-  | otherwise      = fromRational . toRational <$> Heap.viewHead lh
-  where
-    average x l = (/2 ) . fromRational $ toRational (x + l)
-
+median = medianWith
+           (fromRational . toRational)
+           (\ x l -> (/2 ) . fromRational $ toRational (x + l))
 
 -- | A version of 'median' optimized for the case where the result
 -- type is the same as the element type.
 --
 -- Complexity: \( O(1) \)
 medianSame :: (Real a, Fractional a) => MedianStream a -> Maybe a
-medianSame ms@(MedianStream lh rh)
-  | even $ size ms = averageSame <$> Heap.viewHead lh <*> Heap.viewHead rh
-  | otherwise      = Heap.viewHead lh
-  where
-    averageSame x l = (x + l)/2
+medianSame = medianWith id (\ x l -> (x + l)/2)
+
+-- | Generalized median: @median f g ms@ returns @f x@ if there's a
+-- unique contender, @g x y@ if there are two.  Use @median id const@
+-- for a least element-biased call if you don't care too much about
+-- the middle.
+--
+-- Complexity: \( O(1) \)
+medianWith :: Ord a => (a -> b) -> (a -> a -> b) -> MedianStream a -> Maybe b
+medianWith single double ms@(MedianStream lh rh)
+  | even $ size ms = double <$> Heap.viewHead lh <*> Heap.viewHead rh
+  | otherwise      = single <$> Heap.viewHead lh
 
 -- | Returns the number of elements in the MedianStream.
 --
@@ -124,11 +129,11 @@ size (MedianStream lh rh) = Heap.size lh + Heap.size rh
 -- | Creates a MedianStream from a list of input elements.
 --
 -- Complexity: \( O(n \lg n) \)
-fromList :: Real a => [a] -> MedianStream a
+fromList :: Ord a => [a] -> MedianStream a
 fromList = insertList empty
 
 -- | Adds a list of input elements to an existing MedianStream
 --
 -- Complexity: \( O(n \lg n) \)
-insertList :: Real a => MedianStream a -> [a] -> MedianStream a
+insertList :: Ord a => MedianStream a -> [a] -> MedianStream a
 insertList = foldl' (+>)
