@@ -48,6 +48,17 @@ halves :: [a] -> ([a], [a])
 halves ls = splitAt mid ls
   where mid = length ls `div` 2
 
+prop_medianStreamOnBoolsMedianWith :: [Bool] -> Bool
+prop_medianStreamOnBoolsMedianWith xs =
+  let l = length xs
+      t = length (filter id xs)
+      expected | l == 0 = Nothing
+               | odd l = Just (Left (2*t > l))
+               | 2*t < l = Just (Right (False,False))
+               | 2*t > l = Just (Right (True,True))
+               | otherwise = Just (Right (False,True))
+  in medianWith Left ((Right .) . (,)) (fromList xs) == expected
+
 return []
 
 runTests :: IO Bool
